@@ -2,19 +2,80 @@
 use drop_code::drop_code;
 
 #[test]
-fn test_one_block() {
-	let test = "";
-	let test2 = "";
-	let test3 = "";
+fn auto_test_syntax() {
+	let test = "test_str";
+	let test2 = "test2_str";
+	let test3 = "test3_str";
 	
-	drop_code! {
-		println!("1");
-	};
-	drop_code!((test) {
-		println!("#1 drop {}", std::mem::size_of_val(test));
-	});
+	{ // AnonEmpty
+		static mut IS_RUN: bool = false;
+		unsafe { IS_RUN = false; }
+		{
+			drop_code! {
+				unsafe { IS_RUN = true }
+			};
+			// auto_run_drop_code
+		}
+		assert_eq!(unsafe { IS_RUN }, true);
+	}
+	{ // EmptyBlock
+		static mut IS_RUN: bool = false;
+		unsafe { IS_RUN = false; }
+		{
+			drop_code!(() {
+				unsafe { IS_RUN = true }
+			});
+			// auto_run_drop_code
+		}
+		assert_eq!(unsafe { IS_RUN }, true);
+	}
+	{ // EmptyBlock + meta for drop_trait
+		static mut IS_RUN: bool = false;
+		unsafe { IS_RUN = false; }
+		{
+			drop_code!(#[inline(always)]: #[inline(always)]: () {
+				unsafe { IS_RUN = true }
+			});
+		}
+		assert_eq!(unsafe { IS_RUN }, true);
+	}
+	{ // Arg1Block + unk type arg
+		static mut SIZE_TEST: usize = 0;
+		unsafe { SIZE_TEST = 0; }
+		let test: String = test.to_string(); // size &A != &str (&A: ptr)!=(&str: leng+ptr)
+		assert_eq!(unsafe { SIZE_TEST } != core::mem::size_of_val(&test), true);
+		
+		//{
+			drop_code!((test) {
+				// test: A (A - UNK TYPE) <<
+				
+				unsafe { SIZE_TEST = core::mem::size_of_val(test as &A); }
+			});
+		//}
+		assert_eq!(unsafe { SIZE_TEST }, core::mem::size_of_val(&test as &String));
+	}
+	{ // Arg2Block + unk type arg
+		static mut SIZE_TEST: usize = 0;
+		static mut SIZE_TEST2: usize = 0;
+		unsafe { SIZE_TEST = 0; }
+		unsafe { SIZE_TEST2 = 0; }
+		assert_eq!(unsafe { SIZE_TEST  } != core::mem::size_of_val(test), true);
+		assert_eq!(unsafe { SIZE_TEST2 } != core::mem::size_of_val(test2), true);
+		
+		{
+			drop_code!((test, test2) {
+				// test: A (A - UNK TYPE) <<
+				
+				unsafe { SIZE_TEST = core::mem::size_of_val(test) }
+				unsafe { SIZE_TEST2 = core::mem::size_of_val(test2) }
+			});
+		}
+		assert_eq!(unsafe { SIZE_TEST }, core::mem::size_of_val(test));
+		assert_eq!(unsafe { SIZE_TEST2 }, core::mem::size_of_val(test2));
+	}
+	
 	drop_code!((test, test2: &'static str) {
-		*test2 = "GG";
+		//*test2 = "GG";
 		println!(
 			"#2 drop {}:{}", 
 			std::mem::size_of_val(test),
@@ -29,8 +90,13 @@ fn test_one_block() {
 			std::mem::size_of_val(test3)
 		);
 	});
-	***test = "ok"; // ***???, 3dropfn!
+	**test = "ok"; // ***???, 3dropfn!
 	println!("{test}");
+}
+
+#[test]
+fn test_one_block() {
+	
 }
 
 #[test]
