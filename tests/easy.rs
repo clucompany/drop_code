@@ -39,28 +39,28 @@ fn auto_test_syntax() {
 		}
 		assert_eq!(unsafe { IS_RUN }, true);
 	}
-	{ // Arg1Block + unk type arg
-		static mut SIZE_TEST: usize = 0;
-		unsafe { SIZE_TEST = 0; }
-		let test: String = test.to_string(); // size &A != &str (&A: ptr)!=(&str: leng+ptr)
-		assert_eq!(unsafe { SIZE_TEST } != core::mem::size_of_val(&test), true);
-		
-		//{
-			drop_code!((test) {
-				// test: A (A - UNK TYPE) <<
-				
-				unsafe { SIZE_TEST = core::mem::size_of_val(test as &A); }
+	{ // Arg1Block + str type arg
+		let mut test: String = test.to_string(); // size &A != &str (&A: ptr)!=(&str: leng+ptr)
+		assert_eq!(test, "test_str");
+		{
+			assert_eq!(test, "test_str");
+			drop_code!((mut test: String) {
+				// test: A (A - UNK TYPE) <<";
+				test.push_str("++");
 			});
-		//}
-		assert_eq!(unsafe { SIZE_TEST }, core::mem::size_of_val(&test as &String));
+			assert_eq!(test.as_str(), "test_str");
+			// drop code mutlogic
+			// autorun test.push_str!
+		}
+		assert_eq!(test, "test_str++");
 	}
 	{ // Arg2Block + unk type arg
 		static mut SIZE_TEST: usize = 0;
 		static mut SIZE_TEST2: usize = 0;
 		unsafe { SIZE_TEST = 0; }
 		unsafe { SIZE_TEST2 = 0; }
-		assert_eq!(unsafe { SIZE_TEST  } != core::mem::size_of_val(test), true);
-		assert_eq!(unsafe { SIZE_TEST2 } != core::mem::size_of_val(test2), true);
+		assert_eq!(unsafe { SIZE_TEST  } != core::mem::size_of_val(&test as &&str), true);
+		assert_eq!(unsafe { SIZE_TEST2 } != core::mem::size_of_val(&test2 as &&str), true);
 		
 		{
 			drop_code!((test, test2) {
@@ -70,8 +70,8 @@ fn auto_test_syntax() {
 				unsafe { SIZE_TEST2 = core::mem::size_of_val(test2) }
 			});
 		}
-		assert_eq!(unsafe { SIZE_TEST }, core::mem::size_of_val(test));
-		assert_eq!(unsafe { SIZE_TEST2 }, core::mem::size_of_val(test2));
+		assert_eq!(unsafe { SIZE_TEST }, core::mem::size_of_val(&test as &&str));
+		assert_eq!(unsafe { SIZE_TEST2 }, core::mem::size_of_val(&test2 as &&str));
 	}
 	
 	drop_code!((test, test2: &'static str) {
@@ -90,7 +90,7 @@ fn auto_test_syntax() {
 			std::mem::size_of_val(test3)
 		);
 	});
-	**test = "ok"; // ***???, 3dropfn!
+	//***test = "ok"; // ***???, 3dropfn!
 	println!("{test}");
 }
 
@@ -168,7 +168,7 @@ fn easy_use_twoargs() {
 			return true;
 		}
 		
-		if a == &mut 1 {
+		if a == 1 {
 			// autorun drop code
 			return true;
 		}
@@ -200,10 +200,10 @@ fn easy_use_oneargs() {
 		drop_code!((a: usize) {
 			unsafe { OLD_A = *a; }
 		});
-		if a == &mut 1 {
+		/*if *a == 1 {
 			// autorun drop code
 			return true;
-		}
+		}*/
 		
 		// autorun drop code
 		false
