@@ -34,7 +34,7 @@ Add this to your Cargo.toml:
 
 ```toml
 [dependencies]
-drop_code  = "1.0.0"
+drop_code = "1.0.0"
 ```
 
 and this to your source code:
