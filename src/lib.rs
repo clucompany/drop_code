@@ -20,7 +20,7 @@
 
 ## Short example:
 
-```rust
+```should_panic
 use drop_code::drop_code;
 
 #[allow(unreachable_code)]
