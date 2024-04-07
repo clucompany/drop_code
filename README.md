@@ -66,13 +66,13 @@ fn main() {
 </a>
 
 ## License:
-This project has a dual license according to (LICENSE-MIT) and (LICENSE-APACHE-2-0).
+This project has a single license (LICENSE-APACHE-2.0).
 
 <div align="left">
   <a href="https://github.com/denisandroid">
     <img align="left" src="https://github.com/UlinProject/img/blob/main/block_220_100/uproject.png?raw=true" alt="uproject"/>
   </a>
-  <b>&nbsp;Copyright (c) 2023-2024 #UlinProject</b>
+  <b>&nbsp;Copyright (c) 2022-2024 #UlinProject</b>
 	
   <b>&nbsp;(Denis Kotlyarov).</b>
   </br></br></br>
