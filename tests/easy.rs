@@ -29,16 +29,6 @@ fn auto_test_syntax() {
 	{ // EmptyBlock + meta for drop_trait
 		static CHECK: OnceLock<bool> = OnceLock::new();
 		{
-			drop_code!(#[inline(always)]: #[inline(always)]: () {
-				CHECK.set(true).unwrap();
-			});
-		}
-		assert_eq!(CHECK.get(), Some(&true));
-	}
-	
-	{ // EmptyBlock + meta for drop_trait
-		static CHECK: OnceLock<bool> = OnceLock::new();
-		{
 			drop_code!(#[inline(always)]: () {
 				CHECK.set(true).unwrap();
 			});

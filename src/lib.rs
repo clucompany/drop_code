@@ -1,4 +1,4 @@
-//Copyright 2022 #UlinProject Denis Kotlyarov (Денис Котляров)
+//Copyright 2022-2024 #UlinProject Denis Kotlyarov (Денис Котляров)
 
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,56 +12,100 @@
 //See the License for the specific language governing permissions and
 // limitations under the License.
 
-// #Ulin Project 2022
+// #Ulin Project 2022-2024
 //
 // *_---
 
+/*! Macro for ensuring critical code execution on function return or panics in Rust, making it easy to include essential code for reliable operation.
+
+## Short example:
+
+```rust
+use drop_code::drop_code;
+
+#[allow(unreachable_code)]
+fn main() {
+	drop_code! {
+		println!("Code that must be executed in any situation."); // 3
+	}
+	
+	println!("your code"); // 1
+	panic!("panic info"); // 2
+}
+```
+
+## Full syntax example:
+
+```rust
+use drop_code::drop_code;
+
+struct AlwaysDropLogic {}
+
+impl AlwaysDropLogic {
+	fn drop_logic(&mut self) {
+		println!("#[] drop_logic!");
+	}
+	
+	fn valid_logic(&mut self) {
+		println!("#[] valid_logic!");
+	}
+}
+
+fn main() {
+	let mut adl = AlwaysDropLogic {};
+	drop_code!(#[inline(always)]: (mut adl: AlwaysDropLogic) {
+		adl.drop_logic();
+	});
+	
+	adl.valid_logic();
+	// out: 
+	// #[] valid_logic!
+	// #[] drop_logic!
+}
+```
+
+## Technical concept: 
+The drop_code macro generates the drop function code for the Drop trait in Rust, 
+creating a hidden structure that encapsulates user-supplied arguments from the macro 
+and ensuring their transfer. This mechanism guarantees the execution of critical 
+operations when the object is destroyed, facilitating reliable handling of essential 
+code within Rust applications, with the order of code execution dictated by Rust's 
+rules and conventions.
+
+
+
+*/
+
 #![no_std]
 
-pub mod core;
-
-/// A handy macro for quickly implementing code that will be executed on deletion. 
-/// Replaces the tedious work of creating a hidden struct with data types inside a 
-/// function and implementing the `Drop` hidden trait for that struct.
+/// Macro for ensuring critical code execution on function return or panics in Rust, 
+/// making it easy to include essential code for reliable operation. 
 #[macro_export]
 macro_rules! drop_code {
 	[
 		@raw $(#[ $meta:meta ]:)* $name_struct:ident ( $($($args_in:tt)+)? ) {
 			$($drop_code:tt)*
-		} 
+		}
 	] => {
 		#[allow(unused_mut)]
 		#[allow(unused_variables)]
 		#[allow(non_snake_case)]
 		let mut $name_struct = {
-			use $crate::core::DropCodeMarker;
 			$crate::__drop_code_compareimpls! (
 				#[allow(non_snake_case)]
 				struct $name_struct {
 					$($($args_in)*)?
 				}
 				
-				impl[$($($args_in)*)?] DropCodeMarker for $name_struct {}
-				
 				impl[$($($args_in)*)?] Drop for $name_struct {
 					#[allow(unused_attributes)]
 					$(#[$meta])*
 					fn drop(&mut self) {
-						/*$(
-							#[allow(unused_variables)]
-							#[allow(unused_mut)]
-							let ref mut $args_in = self.$args_in;
-						)*/
 						$(
 							$crate::__drop_code_init_automut_refslet! {
 								let ref automut self.( $($args_in)* )
 							}
 						)?
-						/*$(
-							let ( $($args_in),* ) = ( $(self.$args_in),* );
-						)?*/
-							
-						
 						
 						$($drop_code)*
 					}
