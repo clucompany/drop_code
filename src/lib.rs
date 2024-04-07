@@ -25,7 +25,11 @@ pub mod core;
 /// function and implementing the `Drop` hidden trait for that struct.
 #[macro_export]
 macro_rules! drop_code {
-	[ @raw $(#[ $meta:meta ]:)* $name_struct:ident ( $($($args_in:tt)+)? ) {$($drop_code:tt)*} ] => {
+	[
+		@raw $(#[ $meta:meta ]:)* $name_struct:ident ( $($($args_in:tt)+)? ) {
+			$($drop_code:tt)*
+		} 
+	] => {
 		#[allow(unused_mut)]
 		#[allow(unused_variables)]
 		#[allow(non_snake_case)]
@@ -79,7 +83,11 @@ macro_rules! drop_code {
 	};
 	
 	// ARGSIN
-	[ $(#[ $meta:meta ]:)* $name_struct:ident ( $($args_in:tt)* ) {$($drop_code:tt)*} ] => {
+	[
+		$(#[ $meta:meta ]:)* $name_struct:ident ( $($args_in:tt)* ) {
+			$($drop_code:tt)*
+		}
+	] => {
 		$crate::__drop_code_transform_inargs_andcontinue! {
 			[] // result
 			[ // left
@@ -95,7 +103,11 @@ macro_rules! drop_code {
 			$($args_in)*
 		}
 	};
-	[ $(#[ $meta:meta ]:)* ( $($args_in:tt)* ) { $($drop_code:tt)* } ] => {
+	[
+		$(#[ $meta:meta ]:)* ( $($args_in:tt)* ) {
+			$($drop_code:tt)*
+		}
+	] => {
 		$crate::__drop_code_transform_inargs_andcontinue! {
 			[] // result
 			[ // left
@@ -111,7 +123,9 @@ macro_rules! drop_code {
 			$($args_in)*
 		}
 	};
-	[ $($drop_code:tt)* ] => {
+	[
+		$($drop_code:tt)*
+	] => {
 		$crate::drop_code! {
 			@raw
 			#[inline]:
@@ -132,7 +146,9 @@ macro_rules! drop_code {
 #[macro_export]
 macro_rules! __drop_code_transform_inargs_andcontinue {
 	// END, CONTINUERUN!
-	[ [ $($result:tt)* ] [$($l:tt)*][$($r:tt)*] $(,)? ] => {
+	[
+		[ $($result:tt)* ] [$($l:tt)*][$($r:tt)*] $(,)?
+	] => {
 		$crate::drop_code! {
 			$($l)* (
 				$($result)*
@@ -143,7 +159,9 @@ macro_rules! __drop_code_transform_inargs_andcontinue {
 	}; 
 	
 	// ALL
-	[ [ $($result:tt)* ] [$($l:tt)*][$($r:tt)*] $args_in:ident $(:$args_ty:ty)? $(, $($unk:tt)* )? ] => {
+	[
+		[ $($result:tt)* ] [$($l:tt)*][$($r:tt)*] $args_in:ident $(:$args_ty:ty)? $(, $($unk:tt)* )?
+	] => {
 		// (mut a: TY)
 		$crate::__drop_code_transform_inargs_andcontinue! {
 			[
@@ -155,7 +173,9 @@ macro_rules! __drop_code_transform_inargs_andcontinue {
 			$($($unk)+)?
 		}
 	};
-	[ [ $($result:tt)* ] [$($l:tt)*][$($r:tt)*] mut $args_in:ident $(:$args_ty:ty)? $(, $($unk:tt)* )? ] => {
+	[
+		[ $($result:tt)* ] [$($l:tt)*][$($r:tt)*] mut $args_in:ident $(:$args_ty:ty)? $(, $($unk:tt)* )?
+	] => {
 		// (mut a: TY)
 		$crate::__drop_code_transform_inargs_andcontinue! {
 			[
@@ -168,7 +188,9 @@ macro_rules! __drop_code_transform_inargs_andcontinue {
 		}
 	};
 	
-	[ [ $($result:tt)* ] [$($l:tt)*][$($r:tt)*] $($unk:tt)* ] => {
+	[
+		[ $($result:tt)* ] [$($l:tt)*][$($r:tt)*] $($unk:tt)*
+	] => {
 		compile_error!(concat!(
 			"Invalid macro syntax, ",
 			stringify!( $($unk)* )
@@ -179,14 +201,20 @@ macro_rules! __drop_code_transform_inargs_andcontinue {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __drop_code_init_struct {
-	[ $name_struct: ident { $(( [$($addition:tt)?] [$args_in:ident] [$($args_ty:ty)?] ))* } ] => {
+	[
+		$name_struct: ident {
+			$(( [$($addition:tt)?] [$args_in:ident] [$($args_ty:ty)?] ))*
+		}
+	] => {
 		$(let ref $($addition)? $args_in = $args_in; )*
 		
 		$name_struct {
 			$( $args_in ),*
 		}
 	};
-	[ $($unk:tt)* ] => {
+	[
+		$($unk:tt)*
+	] => {
 		compile_error!(concat!(
 			"Invalid macro syntax, ",
 			stringify!( $($unk)* )
@@ -442,7 +470,6 @@ macro_rules! __drop_code_compareimpls {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __drop_code_compareimpls_ifexistsargsty_then {
-
 	[
 		if1 :$nty:tt => $([$($next:tt)*])? $(m[$($nextm:tt)*])?
 		
