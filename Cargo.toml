@@ -8,4 +8,8 @@ homepage = "https://github.com/clucompany/drop_code.git"
 license = "Apache-2.0"
 readme = "README.md"
 
+description = " Macro for ensuring critical code execution on function return or panics in Rust, making it easy to include essential code for reliable operation."
+keywords = ["drop_code", "macro", "code-transformation", "no_std", "clucompany"]
+categories = ["development-tools"]
+
 [dependencies]
