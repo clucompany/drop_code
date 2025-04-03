@@ -1,4 +1,3 @@
-
 use drop_code::drop_code;
 
 fn main() {
@@ -12,7 +11,7 @@ fn main() {
 		println!("line 13");
 	}
 	println!("line 12");
-	
+
 	// out:
 	// line 12
 	// line 13

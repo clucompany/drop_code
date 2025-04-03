@@ -1,10 +1,11 @@
-
-use std::sync::OnceLock;
 use drop_code::drop_code;
+use std::sync::OnceLock;
 
+#[allow(clippy::size_of_ref)]
 #[test]
 fn auto_test_syntax() {
-	{ // AnonEmpty
+	{
+		// AnonEmpty
 		static CHECK: OnceLock<bool> = OnceLock::new();
 		{
 			drop_code! {
@@ -14,8 +15,9 @@ fn auto_test_syntax() {
 		}
 		assert_eq!(CHECK.get(), Some(&true));
 	}
-	
-	{ // EmptyBlock
+
+	{
+		// EmptyBlock
 		static CHECK: OnceLock<bool> = OnceLock::new();
 		{
 			drop_code!(() {
@@ -25,8 +27,9 @@ fn auto_test_syntax() {
 		}
 		assert_eq!(CHECK.get(), Some(&true));
 	}
-	
-	{ // EmptyBlock + meta for drop_trait
+
+	{
+		// EmptyBlock + meta for drop_trait
 		static CHECK: OnceLock<bool> = OnceLock::new();
 		{
 			drop_code!(#[inline(always)]: () {
@@ -35,8 +38,9 @@ fn auto_test_syntax() {
 		}
 		assert_eq!(CHECK.get(), Some(&true));
 	}
-	
-	{ // Arg1Block + str type arg
+
+	{
+		// Arg1Block + str type arg
 		let mut test: String = "test_str".to_string(); // size &A != &str (&A: ptr)!=(&str: leng+ptr)
 		{
 			drop_code!((mut test: String) {
@@ -47,17 +51,18 @@ fn auto_test_syntax() {
 		}
 		assert_eq!(test, "test_str++");
 	}
-	
-	{ // Arg2Block + unk type arg
+
+	{
+		// Arg2Block + unk type arg
 		static SIZE_A: OnceLock<usize> = OnceLock::new();
 		static SIZE_B: OnceLock<usize> = OnceLock::new();
-		
+
 		let a: u64 = 0;
 		let b: u64 = 0;
 		{
 			drop_code!((a, b) {
 				// test: A (A - UNK TYPE) <<
-				
+
 				SIZE_A.set(core::mem::size_of_val(a)).unwrap();
 				SIZE_B.set(core::mem::size_of_val(b)).unwrap();
 			});
@@ -65,12 +70,12 @@ fn auto_test_syntax() {
 		assert_eq!(SIZE_A.get(), Some(&core::mem::size_of_val(&a as &u64)));
 		assert_eq!(SIZE_B.get(), Some(&core::mem::size_of_val(&b as &u64)));
 	}
-	
+
 	{
 		let test = "test";
 		let test2 = "test2";
 		let test3 = "test3";
-		drop_code!((test, test2: &'static str) {
+		drop_code!((test, test2) {
 			assert_eq!(
 				core::mem::size_of_val(&"test" as &&str),
 				core::mem::size_of_val(test)

@@ -1,4 +1,3 @@
-
 use drop_code::drop_code;
 
 struct AlwaysDropLogic {}
@@ -7,7 +6,7 @@ impl AlwaysDropLogic {
 	fn drop_logic(&self) {
 		println!("#[] drop_logic!");
 	}
-	
+
 	fn valid_logic(&mut self) {
 		println!("#[] valid_logic!");
 	}
@@ -21,8 +20,7 @@ fn main() {
 		});
 	}
 	adl.valid_logic(); // 2
-	// out: 
+	// out:
 	// #[] drop_logic!
 	// #[] valid_logic!
 }
-

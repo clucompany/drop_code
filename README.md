@@ -2,7 +2,7 @@
 
   <b>[drop_code]</b>
   
-  (Macro for ensuring critical code execution on function return or panics in Rust, making it easy to include essential code for reliable operation.)
+  (A macro that allows you to implement code that will be automatically executed after the function code has finished, be it the end of the function or even a panic state.)
   </br></br>
 
 <div id="badges">
@@ -28,13 +28,13 @@
 </div>
 </div>
 
-## Usage:
+## Usage
 
 Add this to your Cargo.toml:
 
 ```toml
 [dependencies]
-drop_code = "1.0.0"
+drop_code = "1.0.1"
 ```
 
 and this to your source code:
@@ -42,10 +42,10 @@ and this to your source code:
 use drop_code::drop_code;
 ```
 
-## Technical concept: 
-The drop_code macro generates the drop function code for the Drop trait in Rust, creating a hidden structure that encapsulates user-supplied arguments from the macro and ensuring their transfer. This mechanism guarantees the execution of critical operations when the object is destroyed, facilitating reliable handling of essential code within Rust applications, with the order of code execution dictated by Rust's rules and conventions.
+## How does this work?
+The drop_code macro generates a hidden structure and defines the code for the Drop trait, the user can pass any data to the structure to create more complex code. The Drop trait mechanism ensures that critical operations are executed when an object is destroyed, making it easier to reliably handle important code in Rust applications, but note that the order of code execution is determined by Rust's rules and conventions. Note that this code is executed even during a panic, but only if you have not disabled stack unwinding.
 
-## Example:
+## Example
 
 ```rust
 use drop_code::drop_code;
@@ -65,7 +65,7 @@ fn main() {
   See all
 </a>
 
-## License:
+## License
 This project has a single license (LICENSE-APACHE-2.0).
 
 <div align="left">
@@ -78,7 +78,7 @@ This project has a single license (LICENSE-APACHE-2.0).
   </br></br></br>
 </div>
 
-### Apache License:
+### Apache License
 <div align="left">
   <a href="./LICENSE_APACHE">
     <img align="left" src="https://github.com/UlinProject/img/blob/main/block_220_100/apache2.png?raw=true" alt="apache2"/>
